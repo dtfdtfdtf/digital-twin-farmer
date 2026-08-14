@@ -1,0 +1,209 @@
+:root {
+  --soil: #A8481C;
+  --soil-dim: rgba(168,72,28,.14);
+  --canopy: #141F0F;
+  --canopy-2: #1D2C15;
+  --parchment: #F1EAD8;
+  --parchment-2: #E9E0C9;
+  --ink: #20190F;
+  --ink-soft: rgba(32,25,15,.66);
+  --twin: #1F9E8C;
+  --twin-dim: rgba(31,158,140,.14);
+  --gold: #D4A63A;
+  --line: rgba(32,25,15,.14);
+  --line-dark: rgba(241,234,216,.14);
+  --white: #FFFFFF;
+  --danger: #DC3545;
+  --success: #28A745;
+  --warning: #FFC107;
+  --info: #17A2B8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', serif;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    padding: 0 16px;
+  }
+}
+
+.btn {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--twin);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #28b6a2;
+}
+
+.btn-secondary {
+  background: var(--soil);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: #c65a28;
+}
+
+.btn-outline {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn-outline:hover {
+  background: var(--ink);
+  color: var(--parchment);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 24px;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-2 { gap: 8px; }
+.gap-4 { gap: 16px; }
+.gap-6 { gap: 24px; }
+
+.text-center { text-align: center; }
+.text-sm { font-size: 14px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 24px; }
+.text-2xl { font-size: 32px; }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+.mt-6 { margin-top: 24px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+
+.grid {
+  display: grid;
+}
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.gap-4 { gap: 16px; }
+.gap-6 { gap: 24px; }
+
+@media (max-width: 768px) {
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--parchment-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--soil);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--twin);
+}
+@keyframes sweep {
+  0%, 100% { left: 50%; }
+  50% { left: 22%; }
+}
+
+.btn-ghost {
+  border-color: rgba(241,234,216,.3);
+  background: transparent;
+  color: var(--parchment);
+}
+.btn-ghost:hover {
+  border-color: rgba(241,234,216,.6);
+}
+/* Vertical sweep animation for Physical Farm scanline */
+@keyframes sweepVertical {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+/* Horizontal sweep for the split view */
+@keyframes sweep {
+  0%, 100% { left: 50%; }
+  50% { left: 22%; }
+}
+
+.btn-ghost {
+  border-color: rgba(241,234,216,.3);
+  background: transparent;
+  color: var(--parchment);
+}
+.btn-ghost:hover {
+  border-color: rgba(241,234,216,.6);
+}
