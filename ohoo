@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Twin Farmer — Blockchain-Verified Agricultural Identity & Smart Contract Financing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --soil:#A8481C;
+    --canopy:#141F0F;
+    --canopy-2:#1D2C15;
+    --parchment:#F1EAD8;
+    --parchment-2:#E9E0C9;
+    --ink:#20190F;
+    --ink-soft:rgba(32,25,15,.66);
+    --twin:#1F9E8C;
+    --twin-dim:rgba(31,158,140,.14);
+    --gold:#D4A63A;
+    --line:rgba(32,25,15,.14);
+    --line-dark:rgba(241,234,216,.14);
+    --white:#fff;
+    --danger:#DC3545;
+    --success:#28A745;
+    --warning:#FFC107;
+    --info:#17A2B8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Fraunces',serif;letter-spacing:-.01em;margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px;}}
+
+  /* NAV */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(241,234,216,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1180px;margin:0 auto;padding:16px 32px;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;}
+  .brand-mark{
+    width:26px;height:26px;border-radius:4px;
+    background:linear-gradient(135deg,var(--soil) 50%,var(--twin) 50%);
+    flex:none;
+  }
+  .nav-links{display:flex;gap:28px;font-size:14px;color:var(--ink-soft);}
+  .nav-links a{position:relative;padding-bottom:4px;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a::after{
+    content:"";position:absolute;left:0;right:100%;bottom:-1px;height:2px;
+    background:var(--twin);transition:right .25s ease;
+  }
+  .nav-links a:hover::after{right:0;}
+  @media(max-width:860px){.nav-links{display:none;}}
+  .nav-cta{
+    font-size:13px;font-weight:600;padding:9px 16px;border-radius:2px;
+    background:var(--ink);color:var(--parchment);white-space:nowrap;
+  }
+
+  /* HERO */
+  header.hero{
+    background:radial-gradient(1200px 500px at 15% -10%,var(--canopy-2),var(--canopy) 60%);
+    color:var(--parchment);
+    padding:88px 0 0;
+    overflow:hidden;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--twin);display:flex;align-items:center;gap:10px;margin-bottom:22px;
+  }
+  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--twin);box-shadow:0 0 0 4px var(--twin-dim);}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;}
+  @media(max-width:960px){.hero-grid{grid-template-columns:1fr;}}
+  .hero h1{font-size:clamp(34px,4.6vw,58px);line-height:1.04;font-weight:600;}
+  .hero h1 em{font-style:normal;color:var(--twin);}
+  .hero p.lead{margin-top:22px;font-size:17px;line-height:1.65;max-width:46ch;color:rgba(241,234,216,.78);}
+  .hero-ctas{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+  .btn{
+    font-size:14px;font-weight:600;padding:13px 22px;border-radius:2px;
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--twin);color:#08211d;}
+  .btn-primary:hover{background:#28b6a2;}
+  .btn-ghost{border-color:rgba(241,234,216,.3);color:var(--parchment);background:transparent;}
+  .btn-ghost:hover{border-color:rgba(241,234,216,.6);}
+
+  /* TWIN CARD */
+  .twin-wrap{
+    background:linear-gradient(145deg,#0d1a17,#1a2d26);
+    border-radius:16px;
+    padding:28px 24px;
+    border:1px solid rgba(31,158,140,.3);
+    box-shadow:0 12px 48px rgba(0,0,0,.5);
+    position:relative;
+    overflow:hidden;
+    max-width:440px;
+    margin:0 auto;
+  }
+  .twin-wrap::before{
+    content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+    border-radius:50%;background:rgba(31,158,140,.06);
+  }
+  .twin-wrap::after{
+    content:"";position:absolute;bottom:-90px;left:-90px;width:280px;height:280px;
+    border-radius:50%;background:rgba(168,72,28,.06);
+  }
+  .twin-header{
+    display:flex;justify-content:space-between;align-items:center;
+    border-bottom:1px solid rgba(31,158,140,.2);padding-bottom:12px;margin-bottom:16px;
+    position:relative;z-index:1;
+  }
+  .twin-label{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;
+    color:var(--twin);text-transform:uppercase;
+  }
+  .sbt-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    color:rgba(241,234,216,.5);background:rgba(31,158,140,.15);
+    padding:3px 12px;border-radius:12px;letter-spacing:.05em;
+  }
+  .twin-avatar{display:flex;align-items:center;gap:14px;margin-bottom:16px;position:relative;z-index:1;}
+  .avatar-circle{
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg,#2b3a1f,#1a2712);
+    border:2px solid rgba(31,158,140,.4);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .twin-name{font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:var(--parchment);}
+  .twin-id{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(241,234,216,.4);margin-top:2px;}
+  .twin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-bottom:16px;position:relative;z-index:1;}
+  .twin-field span{display:block;color:rgba(241,234,216,.4);font-size:10px;margin-bottom:2px;}
+  .twin-field b{color:var(--parchment);font-weight:500;font-size:13px;}
+  .twin-field .twin-accent{color:var(--twin);font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .score-box{
+    background:rgba(31,158,140,.08);border-radius:8px;padding:12px 16px;
+    margin-bottom:12px;position:relative;z-index:1;
+  }
+  .score-row{display:flex;justify-content:space-between;align-items:center;}
+  .score-label{font-size:12px;color:rgba(241,234,216,.5);}
+  .score-value{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:var(--twin);}
+  .score-bar{width:100%;height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:6px;overflow:hidden;}
+  .score-fill{height:100%;background:linear-gradient(90deg,var(--twin),#28b6a2);border-radius:3px;}
+  .verify-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--twin);position:relative;z-index:1;}
+
+  /* SECTION HEADS */
+  section{padding:80px 0;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:44px;}
+  .section-head .kicker{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--twin);margin-bottom:10px;display:block;}
+  .section-head h2{font-size:clamp(26px,3vw,38px);font-weight:600;max-width:22ch;}
+  .section-head p{max-width:38ch;color:var(--ink-soft);font-size:14.5px;line-height:1.6;}
+
+  /* PROBLEM */
+  .problem-sec{background:var(--canopy);color:var(--parchment);}
+  .problem-sec .section-head p{color:rgba(241,234,216,.66);}
+  .ledger{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line-dark);}
+  .ledger .row{padding:28px 0;border-bottom:1px solid var(--line-dark);border-right:1px solid var(--line-dark);padding-right:24px;}
+  .ledger .row:last-child{border-right:none;}
+  @media(max-width:760px){.ledger{grid-template-columns:1fr;}.ledger .row{border-right:none;}}
+  .ledger .num{font-family:'Fraunces',serif;font-size:48px;font-weight:600;color:var(--twin);}
+  .ledger .label{font-size:14px;color:rgba(241,234,216,.62);margin-top:8px;line-height:1.55;max-width:34ch;}
+  .ledger .src{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:rgba(241,234,216,.35);margin-top:10px;}
+
+  /* LAYERS */
+  .layer-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:860px){.layer-stack{grid-template-columns:1fr;}}
+  .layer-card{
+    border:1px solid var(--line);border-radius:6px;padding:28px 24px;background:var(--white);
+    cursor:pointer;transition:all .3s ease;position:relative;
+  }
+  .layer-card:hover,.layer-card.active{
+    transform:translateY(-6px);
+    box-shadow:0 20px 40px -20px rgba(32,25,15,.4);
+    border-color:var(--twin);
+  }
+  .layer-card .idx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--soil);letter-spacing:.08em;}
+  .layer-card h3{font-size:22px;margin-top:14px;font-weight:600;}
+  .layer-card .stack-name{font-size:14px;color:var(--ink-soft);margin-top:12px;line-height:1.6;}
+  .layer-card .detail{
+    max-height:0;overflow:hidden;transition:max-height .4s ease,margin-top .4s ease;
+    font-size:13.5px;color:var(--ink-soft);line-height:1.7;
+  }
+  .layer-card.active .detail{max-height:300px;margin-top:16px;}
+  .chip{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    background:var(--twin-dim);color:#0e6d5f;padding:4px 10px;border-radius:3px;margin:4px 6px 0 0;
+  }
+
+  /* TOKEN SECTION */
+  .token-sec{background:linear-gradient(180deg,var(--parchment-2),var(--parchment));}
+  .token-display{
+    background:linear-gradient(135deg,#0a1613,#12211d);
+    border-radius:16px;padding:36px;
+    border:1px solid rgba(31,158,140,.4);
+    box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
+    max-width:520px;margin:0 auto;color:var(--parchment);
+    position:relative;overflow:hidden;
+  }
+  .token-display::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(115deg,rgba(31,158,140,.04) 0 2px,transparent 2px 30px);
+    pointer-events:none;
+  }
+  .token-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;position:relative;z-index:1;}
+  .token-title{font-family:'Fraunces',serif;font-size:26px;font-weight:600;}
+  .token-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--twin);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+  .token-chain{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    background:rgba(31,158,140,.18);color:var(--twin);padding:4px 12px;border-radius:12px;
+  }
+  .token-hash{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:rgba(241,234,216,.45);word-break:break-all;
+    background:rgba(0,0,0,.3);padding:10px 14px;border-radius:6px;
+    margin:16px 0;position:relative;z-index:1;
+  }
+  .token-attrs{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative;z-index:1;}
+  .token-attr span{display:block;color:rgba(241,234,216,.4);font-size:10.5px;margin-bottom:3px;}
+  .token-attr b{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:13px;}
+  .token-footer{
+    margin-top:24px;padding-top:16px;border-top:1px solid rgba(31,158,140,.15);
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:rgba(241,234,216,.35);
+    position:relative;z-index:1;
+  }
+
+  /* DEMO DASHBOARD */
+  .demo-sec{background:var(--parchment-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .demo-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;}
+  @media(max-width:960px){.demo-grid{grid-template-columns:1fr;}}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:24px;}
+  .card h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);font-weight:600;margin-bottom:16px;font-family:'IBM Plex Mono',monospace;}
+  .farmer-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+  .farmer-tab{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;padding:10px 18px;border-radius:3px;
+    border:1px solid var(--line);background:var(--white);cursor:pointer;color:var(--ink-soft);
+    transition:all .2s ease;
+  }
+  .farmer-tab.active{background:var(--ink);color:var(--parchment);border-color:var(--ink);}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+  .metric{border:1px solid var(--line);border-radius:4px;padding:12px 14px;}
+  .metric .v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;}
+  .metric .l{font-size:11px;color:var(--ink-soft);margin-top:3px;}
+  .chart-box{height:220px;margin-top:8px;}
+
+  /* CONTRACT SIMULATOR */
+  .contract-steps{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .step-btn{
+    font-size:13px;font-weight:600;padding:10px 18px;border-radius:3px;border:1px solid var(--ink);
+    background:transparent;color:var(--ink);cursor:pointer;transition:all .2s ease;
+  }
+  .step-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .step-btn:not(:disabled):hover{background:var(--ink);color:var(--parchment);}
+  .ledger-feed{
+    background:#0d1a17;border-radius:6px;padding:16px 18px;height:200px;overflow-y:auto;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:#a9d8cc;line-height:2;
+  }
+  .ledger-feed .ln{opacity:0;animation:fadein .3s ease forwards;}
+  @keyframes fadein{to{opacity:1;}}
+  .ledger-feed .tag{color:var(--twin);}
+  .ledger-feed .amt{color:var(--gold);}
+
+  /* WORKFLOW */
+  .flow-sec{background:var(--canopy);color:var(--parchment);padding:80px 0;}
+  .flow-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:20px;}
+  @media(max-width:900px){.flow-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:600px){.flow-grid{grid-template-columns:repeat(2,1fr);}}
+  .flow-step{
+    text-align:center;padding:20px 10px;border:1px solid var(--line-dark);
+    border-radius:6px;background:rgba(31,158,140,.04);position:relative;
+  }
+  .flow-step .num{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--twin);
+    width:28px;height:28px;border-radius:50%;border:1px solid var(--twin);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+  }
+  .flow-step .lbl{font-size:12.5px;color:rgba(241,234,216,.75);line-height:1.4;}
+
+  /* ROADMAP */
+  .phase-row{display:grid;grid-template-columns:140px 1fr;gap:28px;border-top:1px solid var(--line);padding:32px 0;}
+  .phase-row:last-child{border-bottom:1px solid var(--line);}
+  .phase-num{font-family:'IBM Plex Mono',monospace;color:var(--soil);font-size:13px;letter-spacing:.06em;}
+  .phase-months{display:block;font-size:11px;color:var(--ink-soft);margin-top:6px;}
+  .phase-body h3{font-size:20px;font-weight:600;}
+  .phase-body ul{margin:14px 0 0;padding-left:18px;color:var(--ink-soft);font-size:14px;line-height:1.8;}
+
+  /* IMPACT */
+  .impact-sec{background:var(--canopy);color:var(--parchment);}
+  .impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:20px;}
+  @media(max-width:760px){.impact-grid{grid-template-columns:1fr;}}
+  .impact-card{border:1px solid var(--line-dark);border-radius:6px;padding:26px;}
+  .impact-card .n{font-family:'Fraunces',serif;font-size:36px;color:var(--twin);font-weight:600;}
+  .impact-card .d{font-size:13.5px;color:rgba(241,234,216,.62);margin-top:10px;line-height:1.6;}
+  .sdg-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px;}
+  .sdg-chip{font-family:'IBM Plex Mono',monospace;font-size:11.5px;border:1px solid var(--line-dark);padding:8px 14px;border-radius:3px;color:rgba(241,234,216,.72);}
+
+  /* FOOTER */
+  footer{padding:80px 0 40px;}
+  .team-names{margin-top:22px;font-size:15px;color:var(--ink-soft);line-height:1.9;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:48px;padding-top:28px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);flex-wrap:wrap;gap:16px;}
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-mark"></span> Digital Twin Farmer</div>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#layers">How it works</a>
+      <a href="#token">Blockchain ID</a>
+      <a href="#demo">Live demo</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+    <a href="#demo" class="nav-cta">View Demo →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Blockchain-Verified Agricultural Identity · Malawi</span>
+    <div class="hero-grid">
+      <div>
+        <h1>What a farmer can <em>produce</em> matters more than what they <em>own</em>.</h1>
+        <p class="lead">Digital Twin Farmer turns satellite data, soil sensors and repayment history into a verifiable, portable credit identity — so smallholders can borrow against their potential, not their title deed.</p>
+        <div class="hero-ctas">
+          <a href="#demo" class="btn btn-primary">View the live twin →</a>
+          <a href="#problem" class="btn btn-ghost">Read the case for financing</a>
+        </div>
+      </div>
+      <div class="twin-wrap">
+        <div class="twin-header">
+          <span class="twin-label">Digital Twin Identity</span>
+          <span class="sbt-badge">SBT · CELO</span>
+        </div>
+        <div class="twin-avatar">
+          <div class="avatar-circle">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="10" r="6" stroke="#1f9e8c" stroke-width="1.5"/>
+              <path d="M4 28C4 22 9 18 16 18C23 18 28 22 28 28" stroke="#1f9e8c" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div>
+            <div class="twin-name">Farmer Identity</div>
+            <div class="twin-id">DTF-000001</div>
+          </div>
+        </div>
+        <div class="twin-grid">
+          <div class="twin-field"><span>Country</span><b>Malawi</b></div>
+          <div class="twin-field"><span>District</span><b>—</b></div>
+          <div class="twin-field"><span>Enterprise</span><b>Crop / Livestock</b></div>
+          <div class="twin-field"><span>Digital ID</span><b class="twin-accent">DTF-000001</b></div>
+        </div>
+        <div class="score-box">
+          <div class="score-row">
+            <span class="score-label">AI Credit Score</span>
+            <span class="score-value">82%</span>
+          </div>
+          <div class="score-bar"><div class="score-fill" style="width:82%"></div></div>
+        </div>
+        <div class="verify-row">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="#1f9e8c" stroke-width="1.5"/>
+            <path d="M4 7L6 9L10 5" stroke="#1f9e8c" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="mono" style="font-size:11px;">Blockchain Verified • CELO</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROBLEM -->
+<section class="problem-sec" id="problem">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">The financing gap</span>
+        <h2>Malawi's farmers grow the economy. The credit system doesn't see them.</h2>
+      </div>
+      <p>Three barriers compound into one outcome: capital never reaches the field where it would do the most good.</p>
+    </div>
+    <div class="ledger">
+      <div class="row">
+        <div class="num">70%</div>
+        <div class="label">of smallholders hold no land title or physical asset a bank will accept as collateral.</div>
+        <div class="src">— Reserve Bank of Malawi, 2024</div>
+      </div>
+      <div class="row">
+        <div class="num">&lt;10%</div>
+        <div class="label">of agricultural credit in Malawi actually reaches smallholder farmers.</div>
+        <div class="src">— Reserve Bank of Malawi, 2024</div>
+      </div>
+      <div class="row">
+        <div class="num">100%+</div>
+        <div class="label">seasonal interest charged by informal lenders when formal credit is unreachable.</div>
+        <div class="src">— DTF field estimate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAYERS -->
+<section id="layers">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">System architecture</span>
+        <h2>One digital twin. Three layers of trust.</h2>
+      </div>
+      <p>Each layer solves one link in the credit chain. Click a card to see how it works.</p>
+    </div>
+    <div class="layer-stack">
+      <div class="layer-card active" data-layer="0">
+        <div class="idx">Layer 01 — Sense</div>
+        <h3>AI farm characterization</h3>
+        <div class="stack-name">Satellite imagery and optional IoT sensors read the field the way a bank never could.</div>
+        <div class="detail">
+          Sentinel-2 and Landsat feed soil moisture, organic matter and pH proxies. NDVI/NDRE vegetation indices update through the season, feeding a yield model accurate to roughly ±15%.
+          <div>
+            <span class="chip">Sentinel Hub</span>
+            <span class="chip">Google Earth Engine</span>
+            <span class="chip">Scikit-learn</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer-card" data-layer="1">
+        <div class="idx">Layer 02 — Verify</div>
+        <h3>Blockchain identity</h3>
+        <div class="stack-name">A non-transferable Soulbound Token becomes the farmer's permanent, portable credit history.</div>
+        <div class="detail">
+          Biometric hash, verified GPS plot boundary, AI-generated yield capacity and every transaction the farmer completes are written to a single identity that no middleman can seize or forge.
+          <div>
+            <span class="chip">Celo L1</span>
+            <span class="chip">ERC-721 SBT</span>
+            <span class="chip">Fingerprint hash</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer-card" data-layer="2">
+        <div class="idx">Layer 03 — Finance</div>
+        <h3>Smart contract settlement</h3>
+        <div class="stack-name">Inputs flow in against predicted yield; repayment and surplus flow out automatically at harvest.</div>
+        <div class="detail">
+          An agro-processor disburses seed and fertilizer directly against the twin's forecast. At harvest, the contract splits proceeds — repayment to the financier, surplus straight to the farmer's mobile money wallet — with no manual reconciliation.
+          <div>
+            <span class="chip">Solidity</span>
+            <span class="chip">TNM Mpamba</span>
+            <span class="chip">Airtel Money</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCKCHAIN TOKEN -->
+<section class="token-sec" id="token">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Blockchain Identity</span>
+        <h2>The Soulbound Token: a farmer's permanent digital identity.</h2>
+      </div>
+      <p>Non-transferable. Verified. Portable. This is the digital collateral that unlocks formal credit.</p>
+    </div>
+
+    <div class="token-display">
+      <div class="token-top">
+        <div>
+          <div class="token-sub">Soulbound Token</div>
+          <div class="token-title">Grace Banda</div>
+        </div>
+        <span class="token-chain">CELO · SBT</span>
+      </div>
+      <div class="token-hash">0x8f4a1c2e9b7d3f6081a2c9e4b5d7f1032c8a9e6d4b7c2f1a5e3d9b8c7f2a1e6d</div>
+      <div class="token-attrs">
+        <div class="token-attr"><span>Token ID</span><b>DTF-000234</b></div>
+        <div class="token-attr"><span>District</span><b>Kasungu</b></div>
+        <div class="token-attr"><span>GPS Plot</span><b>-13.038, 33.481</b></div>
+        <div class="token-attr"><span>Enterprise</span><b>Maize · Groundnuts</b></div>
+        <div class="token-attr"><span>Biometric</span><b>FP-verified</b></div>
+        <div class="token-attr"><span>Yield Capacity</span><b>4.2 t/ha</b></div>
+        <div class="token-attr"><span>Credit Score</span><b style="color:var(--twin)">84%</b></div>
+        <div class="token-attr"><span>Seasons On-chain</span><b>5</b></div>
+      </div>
+      <div class="token-footer">
+        <span>✓ Non-transferable</span>
+        <span>Verified on Celo L1</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO -->
+<section class="demo-sec" id="demo">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Working prototype</span>
+        <h2>See a farmer's twin, live.</h2>
+      </div>
+      <p>Simulated field data — built to show exactly how the production system will behave once connected to real satellite, sensor and mobile-money feeds.</p>
+    </div>
+
+    <div class="farmer-tabs" id="farmerTabs"></div>
+
+    <div class="demo-grid">
+      <div>
+        <div class="card" style="margin-bottom:22px;">
+          <h4>Digital twin — field sensing</h4>
+          <div class="metric-grid">
+            <div class="metric"><div class="v" id="mMoisture">—</div><div class="l">Soil moisture</div></div>
+            <div class="metric"><div class="v" id="mOrganic">—</div><div class="l">Organic matter</div></div>
+            <div class="metric"><div class="v" id="mPh">—</div><div class="l">Soil pH</div></div>
+            <div class="metric"><div class="v" id="mArea">—</div><div class="l">Plot size</div></div>
+          </div>
+          <h4 style="margin-top:22px;">Yield history &amp; prediction</h4>
+          <div class="chart-box"><canvas id="yieldChart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <h4>Smart contract financing simulator</h4>
+          <div class="contract-steps">
+            <button class="step-btn" id="stepRequest">1. Request input financing</button>
+            <button class="step-btn" id="stepDisburse" disabled>2. Agro-processor disburses</button>
+            <button class="step-btn" id="stepHarvest" disabled>3. Simulate harvest &amp; settle</button>
+            <button class="step-btn" id="stepReset" disabled>Reset</button>
+          </div>
+          <div class="ledger-feed" id="ledgerFeed"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="twin-wrap" style="max-width:100%;margin-bottom:22px;">
+          <div class="twin-header">
+            <span class="twin-label">Soulbound Identity</span>
+            <span class="sbt-badge">SBT · CELO</span>
+          </div>
+          <div class="twin-avatar">
+            <div class="avatar-circle">
+              <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="10" r="6" stroke="#1f9e8c" stroke-width="1.5"/>
+                <path d="M4 28C4 22 9 18 16 18C23 18 28 22 28 28" stroke="#1f9e8c" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="twin-name" id="sbtName">—</div>
+              <div class="twin-id" id="sbtToken">DTF-000000</div>
+            </div>
+          </div>
+          <div class="twin-grid">
+            <div class="twin-field"><span>District</span><b id="sbtDistrict">—</b></div>
+            <div class="twin-field"><span>Enterprise</span><b id="sbtCrop">—</b></div>
+            <div class="twin-field"><span>GPS Plot</span><b id="sbtGps">—</b></div>
+            <div class="twin-field"><span>Seasons</span><b id="sbtSeasons">—</b></div>
+          </div>
+          <div class="score-box">
+            <div class="score-row">
+              <span class="score-label">AI Credit Score</span>
+              <span class="score-value" id="sbtScore">—</span>
+            </div>
+            <div class="score-bar"><div class="score-fill" id="sbtScoreBar" style="width:0%"></div></div>
+          </div>
+          <div class="verify-row">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="#1f9e8c" stroke-width="1.5"/>
+              <path d="M4 7L6 9L10 5" stroke="#1f9e8c" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="mono" style="font-size:11px;">Blockchain Verified • CELO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="flow-sec" id="workflow">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Complete workflow</span>
+        <h2>From farmer registration to smart contract settlement.</h2>
+      </div>
+    </div>
+    <div class="flow-grid">
+      <div class="flow-step"><div class="num">1</div><div class="lbl">Register Farmer</div></div>
+      <div class="flow-step"><div class="num">2</div><div class="lbl">National ID Check</div></div>
+      <div class="flow-step"><div class="num">3</div><div class="lbl">GPS Farm Registration</div></div>
+      <div class="flow-step"><div class="num">4</div><div class="lbl">Satellite Verification</div></div>
+      <div class="flow-step"><div class="num">5</div><div class="lbl">Officer Approval</div></div>
+      <div class="flow-step"><div class="num">6</div><div class="lbl">Historical Records</div></div>
+      <div class="flow-step"><div class="num">7</div><div class="lbl">AI Verification Score</div></div>
+      <div class="flow-step"><div class="num">8</div><div class="lbl">Digital Twin Created</div></div>
+      <div class="flow-step"><div class="num">9</div><div class="lbl">Credit Score</div></div>
+      <div class="flow-step"><div class="num">10</div><div class="lbl">Loan Recommendation</div></div>
+      <div class="flow-step"><div class="num">11</div><div class="lbl">Smart Contract</div></div>
+      <div class="flow-step"><div class="num">12</div><div class="lbl">Harvest &amp; Repayment</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Path to scale</span>
+        <h2>Three phases, thirty-six months.</h2>
+      </div>
+      <p>A deliberately staged rollout — prove the mechanics small, then let the smart contract layer carry the scale.</p>
+    </div>
+
+    <div class="phase-row">
+      <div><div class="phase-num">Phase 01</div><span class="phase-months">Months 1–6 · Pilot</span></div>
+      <div class="phase-body">
+        <h3>100 farmers, one district</h3>
+        <ul>
+          <li>Partners: a farmers' cooperative and a local agricultural extension office</li>
+          <li>Tracking: registrations, loan disbursement rate, repayment rate, yield improvement</li>
+          <li>Budget: MWK 8,500,000 for sensors, developer stipends and farmer incentives</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div><div class="phase-num">Phase 02</div><span class="phase-months">Months 7–18 · Expansion</span></div>
+      <div class="phase-body">
+        <h3>1,000 farmers, three value chains</h3>
+        <ul>
+          <li>Onboard 3 agro-processors across soya, maize and tobacco</li>
+          <li>Integrate the SBT identity with the National Registration Bureau</li>
+          <li>Formalize the credit-scoring algorithm against real repayment data</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div><div class="phase-num">Phase 03</div><span class="phase-months">Months 19–36 · Commercialization</span></div>
+      <div class="phase-body">
+        <h3>10,000 farmers, self-sustaining revenue</h3>
+        <ul>
+          <li>Spin off as an independent social enterprise</li>
+          <li>Revenue model: 2% transaction fee on settled smart contracts</li>
+          <li>License the yield-prediction API to banks and insurers</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="impact-sec">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Projected impact</span>
+        <h2>Built to move a national number, not just a pilot metric.</h2>
+      </div>
+    </div>
+    <div class="impact-grid">
+      <div class="impact-card"><div class="n">+40%</div><div class="d">Projected farmer income increase from fair pricing and reduced informal interest costs.</div></div>
+      <div class="impact-card"><div class="n">1,000+</div><div class="d">Farmers with a formal, portable credit history within two years of launch.</div></div>
+      <div class="impact-card"><div class="n">MWK 50bn</div><div class="d">Agricultural credit this model could unlock nationally at scale.</div></div>
+    </div>
+    <div class="sdg-row">
+      <div class="sdg-chip">MW2063 · Pillar 1: Agricultural Productivity</div>
+      <div class="sdg-chip">SDG 9 · Industry &amp; Innovation</div>
+      <div class="sdg-chip">SDG 1 · No Poverty</div>
+      <div class="sdg-chip">SDG 2 · Zero Hunger</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">The team</span>
+        <h2>Data Craft Solutions</h2>
+      </div>
+      <p>A Malawian team building agricultural finance infrastructure.</p>
+    </div>
+    <div class="team-names">Emmanuel Zutha · Young Chirwa · Juma Milu · Misheck Nzondo · Clement Mughogho · Radson Kayira</div>
+    <div class="foot-bottom">
+      <div>"Turning a farmer's potential into verifiable collateral."</div>
+      <a href="mailto:datacraftsolutions6@gmail.com" class="btn btn-primary">Request a pilot →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------- LAYER CARDS ---------- */
+document.querySelectorAll('.layer-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('.layer-card').forEach(c=>c!==card && c.classList.remove('active'));
+    card.classList.toggle('active');
+  });
+});
+
+/* ---------- FARMER DATA ---------- */
+const FARMERS = [
+  {
+    id:'grace', name:'Grace Banda', district:'Kasungu', crop:'Maize', area:'2.1 ha',
+    gps:'-13.038, 33.481', moisture:'34%', organic:'2.8%', ph:'6.1',
+    seasons:5, score:742, tier:'Tier A — Prime',
+    hist:[1.6,1.8,1.7,2.0,2.1], predicted:2.4,
+    ndviSeed:11, hash:'0x8f4a1c2e9b7d3f6081a2c9e4b5d7f1032c8a9e6d'
+  },
+  {
+    id:'enock', name:'Enock Phiri', district:'Mzimba', crop:'Soybean', area:'1.4 ha',
+    gps:'-11.899, 33.603', moisture:'26%', organic:'2.1%', ph:'5.7',
+    seasons:3, score:615, tier:'Tier B — Developing',
+    hist:[1.1,1.0,1.3,1.4,1.4], predicted:1.6,
+    ndviSeed:37, hash:'0x3b7e9a1d5c2f8064b1e7a3c9d2f6081a5c3e9b74'
+  },
+  {
+    id:'mercy', name:'Mercy Nkhoma', district:'Rumphi', crop:'Groundnuts / Tobacco', area:'3.0 ha',
+    gps:'-11.020, 33.860', moisture:'41%', organic:'3.4%', ph:'6.4',
+    seasons:6, score:810, tier:'Tier A+ — Preferred',
+    hist:[2.0,2.2,2.3,2.5,2.7], predicted:3.0,
+    ndviSeed:59, hash:'0x1a9c4e7b2d6f803c9a1e5b7d2f4082e6c9b1a3d5'
+  }
+];
+
+let current = FARMERS[0];
+let yieldChart, loanAmount = 0, predictedYield = 0;
+
+/* ---------- FARMER TABS ---------- */
+const tabsEl = document.getElementById('farmerTabs');
+FARMERS.forEach((f,i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'farmer-tab' + (i===0?' active':'');
+  btn.textContent = `${f.name} · ${f.district}`;
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.farmer-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    current = f;
+    renderFarmer();
+    resetContract();
+  });
+  tabsEl.appendChild(btn);
+});
+
+/* ---------- RENDER FARMER ---------- */
+function renderFarmer(){
+  document.getElementById('mMoisture').textContent = current.moisture;
+  document.getElementById('mOrganic').textContent = current.organic;
+  document.getElementById('mPh').textContent = current.ph;
+  document.getElementById('mArea').textContent = current.area;
+
+  document.getElementById('sbtName').textContent = current.name;
+  document.getElementById('sbtDistrict').textContent = current.district;
+  document.getElementById('sbtCrop').textContent = current.crop;
+  document.getElementById('sbtGps').textContent = current.gps;
+  document.getElementById('sbtSeasons').textContent = current.seasons;
+  document.getElementById('sbtToken').textContent = 'DTF-' + String(current.score).padStart(6,'0').slice(0,6);
+  document.getElementById('sbtScore').textContent = Math.round(current.score/10) + '%';
+  document.getElementById('sbtScoreBar').style.width = Math.round(current.score/10) + '%';
+
+  predictedYield = current.predicted;
+
+  const labels = ['2022','2023','2024','2025','2026'];
+  const actual = current.hist.slice(0,5);
+  const predicted = [null,null,null,null,current.predicted];
+
+  if(yieldChart) yieldChart.destroy();
+  const ctx = document.getElementById('yieldChart').getContext('2d');
+  yieldChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Actual Yield (t/ha)',data:actual,borderColor:'#A8481C',backgroundColor:'rgba(168,72,28,.08)',tension:.35,fill:true,pointRadius:4,pointBackgroundColor:'#A8481C'},
+        {label:'AI Predicted (t/ha)',data:predicted,borderColor:'#1F9E8C',borderDash:[6,4],tension:.35,pointRadius:4,pointBackgroundColor:'#1F9E8C'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},
+      scales:{y:{grid:{color:'rgba(32,25,15,.06)'},title:{display:true,text:'t/ha'}},x:{grid:{display:false}}}
+    }
+  });
+}
+
+/* ---------- SMART CONTRACT ---------- */
+const feed = document.getElementById('ledgerFeed');
+const btnRequest = document.getElementById('stepRequest');
+const btnDisburse = document.getElementById('stepDisburse');
+const btnHarvest = document.getElementById('stepHarvest');
+const btnReset = document.getElementById('stepReset');
+
+function log(html){
+  const line = document.createElement('div');
+  line.className = 'ln';
+  line.innerHTML = html;
+  feed.appendChild(line);
+  feed.scrollTop = feed.scrollHeight;
+}
+function fakeHash(){
+  return '0x'+Array.from({length:12}).map(()=>Math.floor(Math.random()*16).toString(16)).join('');
+}
+function resetContract(){
+  feed.innerHTML = '';
+  btnRequest.disabled = false;
+  btnDisburse.disabled = true;
+  btnHarvest.disabled = true;
+  btnReset.disabled = true;
+  log('<span class="tag">[ledger]</span> awaiting contract initiation for '+current.name+'…');
+}
+
+btnRequest.addEventListener('click',()=>{
+  const pricePerTon = 420000;
+  loanAmount = Math.round(predictedYield * pricePerTon * 0.45 / 1000)*1000;
+  log(`<span class="tag">[twin]</span> yield forecast confirmed: <b>${predictedYield} t/ha</b> for ${current.name}`);
+  log(`<span class="tag">[contract]</span> financing request created — hash ${fakeHash()}`);
+  log(`<span class="tag">[terms]</span> input loan offered: <span class="amt">MWK ${loanAmount.toLocaleString()}</span> against forecast yield`);
+  btnRequest.disabled = true;
+  btnDisburse.disabled = false;
+  btnReset.disabled = false;
+});
+
+btnDisburse.addEventListener('click',()=>{
+  log(`<span class="tag">[agro-processor]</span> inputs disbursed to farmer — seed &amp; fertilizer released`);
+  log(`<span class="tag">[chain]</span> disbursement recorded on SBT — tx ${fakeHash()}`);
+  log(`<span class="tag">[status]</span> season in progress — twin will continue monitoring NDVI trend`);
+  btnDisburse.disabled = true;
+  btnHarvest.disabled = false;
+});
+
+btnHarvest.addEventListener('click',()=>{
+  const totalRevenue = Math.round(predictedYield * 420000);
+  const repay = Math.min(loanAmount*1.08, totalRevenue*0.6);
+  const surplus = Math.max(totalRevenue - repay, totalRevenue*0.2);
+  log(`<span class="tag">[harvest]</span> yield delivered — settlement triggered automatically`);
+  log(`<span class="tag">[contract]</span> repayment routed to agro-processor: <span class="amt">MWK ${Math.round(repay).toLocaleString()}</span>`);
+  log(`<span class="tag">[mobile money]</span> surplus sent to farmer wallet: <span class="amt">MWK ${Math.round(surplus).toLocaleString()}</span>`);
+  log(`<span class="tag">[chain]</span> credit score updated on SBT — repayment on time, +score`);
+  btnHarvest.disabled = true;
+});
+
+btnReset.addEventListener('click', resetContract);
+
+/* ---------- INIT ---------- */
+renderFarmer();
+resetContract();
+</script>
+</body>
+</html>
